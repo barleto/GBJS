@@ -4,13 +4,14 @@ The gameboy is a 16-bit device, meaning ti can access only 65536 individual addr
 Its memory address space is separated in regions that map different parts of the hardware. Thusm a "Memory map"
 can be drawn:
                                                                                                  
-0k____________16k_________32K_________40k_________48k__________ _  _64k
-|  |           |           |           |           |           | || |→ I/O
-|  | ROM       | ROM       | GPU       | Ext.      | Working   | ||_|
-|  | Bank 0    | Bank 1    | VRAM      | RAM       | RAM       | || |
-|__|_____8k____|____24k____|_____8k____|_____8k____|____56k____|_||_|→ ZRAM
+0_00FF________16k_________32K_________40k_________48k______________64k
+|  |           |           |           |           |           | | |
+|  | ROM       | ROM       | GPU       | Ext.      | Working   | | |
+|  | Bank 0    | Bank 1    | VRAM      | RAM       | RAM       | | |→ I/O and then ZRAM
+|__|_____8k____|____24k____|_____8k____|_____8k____|____56k____|_|_|
   ↓                                                             ↓
- BIOS                                                 sprite attributes
+ BIOS(256-byte)                                          sprite attributes
+
 Regions details:
 - [0000-3FFF] Cartridge ROM, bank 0: The first 16,384 bytes of the cartridge program are always available at
     this point in the memory map. Special circumstances apply:
@@ -138,7 +139,7 @@ class MMU {
      * @param val
      */
     rw(addr) {
-        return 0xff;
+        return this.rb(addr) + (this.rb(addr + 1) << 8);
     }
     /**
      * Write 8-bit byte to a given address

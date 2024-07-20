@@ -1,13 +1,26 @@
+
 document.addEventListener('DOMContentLoaded', () => {
+    let fileInput: File | undefined = undefined;
+    
     const gpu = new GPU("screen");
-    for (let y = 0; y < gpu.height; y++) {
-        for (let x = 0; x < gpu.width; x++) {
-            const r = Math.floor((x / gpu.width) * 255);
-            const g = Math.floor((y / gpu.height) * 255);
-            const b = 128;
-            gpu.setPixel(x, y, r, g, b);
+    const z80 = new Z80(gpu);
+
+    document.getElementById("fileInput")?.addEventListener("change", (event: any) => {
+        fileInput = event.target.files[0];
+    });
+
+    
+
+    document.getElementById("loadRomButton")?.addEventListener("click", () => {
+        if (!fileInput) {
+            alert("No file selected.");
+            return;
         }
+        startEmulation(fileInput);
+    });
+
+    function startEmulation(romFile: File) {
+        z80.loadRom(romFile);
     }
-    console.log("AAAAAAA");
-    gpu.refresh();
+
 });
